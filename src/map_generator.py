@@ -36,12 +36,14 @@ def read_map():
     for i in range(0 , len(m)):
         for j in range(0 , len(m[i])):
             if m[i][j] == 'S':
-                x, y = i, j
+                x, y = j, i
 
     map_object = {
         'Treasure_count': p_counter,
         'Map': m,
-        'Start': (x, y)
+        'Start': (y, x),
+        'Width': len(m[0])-1,
+        'Height': len(m)-1
     }
     return map_object
 

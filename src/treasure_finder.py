@@ -3,6 +3,7 @@ from virtual_machine import VirtualMachine
 from map_generator import read_map
 from evolution import genetic_algorithm
 import numpy
+import copy
 
 steps = {
     'H': (-1, 0),
@@ -12,12 +13,12 @@ steps = {
 }
 
 
-def generate_population(n, k ):
+def generate_population(n, k):
     population = []
     for i in range(0, n):
         individual = generate_individual(k)
         population.append(individual)
-    pop = list(map(lambda x: {'Object': x , 'Fiitness': fiitness_function(x)} , population))
+    pop = list(map(lambda x: {'Object': x, 'Fiitness': fiitness_function(x)}, population))
     print(pop)
     return pop
 
@@ -33,20 +34,23 @@ def fiitness_function(individual):
     m = read_map()
     machine = VirtualMachine(500)
     curr = m['Start']
-    fiitness = 0
-    for step in machine.run_program(individual):
-        # fiitness -= 0.001
+    fiitness = 1
+    for step in machine.run_program(copy.deepcopy(individual)):
+        if fiitness > m['Treasure_count']:
+            return fiitness
+        fiitness -= 0.01
         curr = (curr[0] + steps[step][0], curr[1] + steps[step][1])
         try:
-            if curr[0] < 0 or curr[1] < 0 or curr[1] > len(m) - 1: # toto treba vyriesit ze co je x a co y
+            if curr[0] < 0 or curr[1] < 0 or curr[0] > m['Height'] or curr[1] > m['Width']:
                 # print('out  of index')
-                return 0.5 if fiitness <= 0 else fiitness
+                return 0 if fiitness <= 0 else fiitness
             if m['Map'][curr[0]][curr[1]] == 'P':
                 fiitness += 1
                 m['Map'][curr[0]][curr[1]] = 'X'
         except:
-            return 0.5 if fiitness <= 0 else fiitness
-    return 0.5 if fiitness <= 0 else fiitness
+            print(curr)
+            return 0 if fiitness <= 0 else fiitness
+    return 0 if fiitness <= 0 else fiitness
 
 
 def exchange_mutation(individual):
@@ -70,16 +74,15 @@ def add_mutation(individual):
 
 def change_mutation(individual):
     c = randint(0, 63)
-    pos = randint(0, 7)
     try:
-        individual[c] = individual[c] ^ (1 << pos)
+        individual[c] = randint(0, (1 << 8) - 1)
     except IndexError:
         pass
     return individual
 
 
 def mutation(individual):
-    mutation_choice = numpy.random.choice([0, 1, 2, 3], p=[0.4, 0, 0.25, 0.35])
+    mutation_choice = numpy.random.choice([0, 1, 2, 3], p=[0.15, 0, 0.20, 0.65])
 
     if mutation_choice == 0:
         return exchange_mutation(individual)
@@ -92,7 +95,7 @@ def mutation(individual):
 
 
 def crossover(father, mother):
-    div = randint(0, 63)
+    div = randint(0, 20)
     child = []
     for i in range(0, div):
         child.append(father[i])
@@ -108,6 +111,47 @@ def requirement(fiitness):
     return False
 
 
+def print_way(individual):
+    m = read_map()
+    machine = VirtualMachine(500)
+    curr = m['Start']
+    t_c = 0
+    for step in machine.run_program(copy.deepcopy(individual)):
+        curr = (curr[0] + steps[step][0], curr[1] + steps[step][1])
+        print(curr)
+        try:
+            if curr[0] < 0 or curr[1] < 0 or curr[0] > m['Height'] or curr[1] > m['Width']:
+                # print('out  of index')
+                return
+            if m['Map'][curr[0]][curr[1]] == 'P':
+                t_c += 1
+                print(t_c)
+                m['Map'][curr[0]][curr[1]] = 'X'
+        except:
+            return
+    return
+
+
 # def genetic_algorithm(population, fiitness_fn, mutate_fn, reproduce_fn, requirement_fn):
 
-genetic_algorithm(generate_population(40, 40), fiitness_function, mutation, crossover, requirement)
+top = genetic_algorithm(generate_population(40, 40), fiitness_function, mutation, crossover, requirement)
+print(top['Fiitness'])
+print(top['Object'])
+print_way(top['Object'])
+
+
+# program = [240, 141, 56, 66, 29, 45, 186, 217, 98, 1, 29, 96, 7, 1, 254, 151, 231, 81, 71, 163, 85, 19,
+# 186, 75, 244, 242, 88, 1, 2, 82, 248, 22, 115, 238, 216, 231, 106, 192, 219, 18, 7, 243, 239, 249, 20, 112,
+# 92, 231, 29, 105, 108, 22, 56, 114, 88, 36, 132, 186, 45, 52, 249, 22, 125, 186]
+# machine = VirtualMachine(500)
+#
+# pat = [x for x in machine.run_program(program)]
+# print(fiitness_function(program))
+
+
+def test_fiitness_fn():
+    program = [240, 141, 56, 66, 29, 45, 186, 217, 98, 1, 29, 96, 7, 1, 254, 151, 231, 81, 71, 163, 85, 19,
+               186, 75, 244, 242, 88, 1, 2, 82, 248, 22, 115, 238, 216, 231, 106, 192, 219, 18, 7, 243, 239, 249, 20,
+               112,
+               92, 231, 29, 105, 108, 22, 56, 114, 88, 36, 132, 186, 45, 52, 249, 22, 125, 186]
+    assert fiitness_function(program) == 5.840000000000002
