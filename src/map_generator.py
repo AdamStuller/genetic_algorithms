@@ -21,7 +21,7 @@ def generate_map(x, y):
 
 def read_map():
     m = []
-    p = path.join('.', 'src', 'maps', 'map1.txt')
+    p = path.join('.', 'maps', 'map1.txt')
     p_counter = 0
     with open(p) as fp:
         for line in fp:
@@ -47,4 +47,4 @@ def read_map():
 
 
 # generate_map(50 , 50)
-print(read_map())
+# print(read_map())
