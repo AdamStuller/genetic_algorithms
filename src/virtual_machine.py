@@ -69,10 +69,7 @@ class VirtualMachine:
             return
 
         for i in range(0, self.LIMIT):
-
-            # print(i)
             instruction = VirtualMachine.get_instruction(curr['Memory_block'])
-            # print(instruction)
             if instruction == 1:
                 curr = self.increment(curr)
                 program[curr['Address']] = curr['Memory_block']
@@ -82,9 +79,7 @@ class VirtualMachine:
             elif instruction == 2:
                 curr = self.jump(curr, program)
             elif instruction == 3:
-                # output.append(VirtualMachine.get_letter(curr['Memory_block']))
                 yield VirtualMachine.get_letter(curr['Memory_block'])
-                # print(VirtualMachine.get_letter(curr['Memory_block']))
 
             if instruction != 2 and curr['Address'] != 63:
                 curr['Address'] += 1
@@ -96,11 +91,8 @@ class VirtualMachine:
                 return
 
             if curr['Memory_block'] == 0:
-                # return output
                 return
 
-        # print(output)
-        # return output
         return
 
 

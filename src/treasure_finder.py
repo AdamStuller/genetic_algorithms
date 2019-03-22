@@ -38,7 +38,7 @@ def fiitness_function(individual):
     for step in machine.run_program(copy.deepcopy(individual)):
         if fiitness > m['Treasure_count']:
             return fiitness
-        fiitness -= 0.01
+        fiitness -= 0.001
         curr = (curr[0] + steps[step][0], curr[1] + steps[step][1])
         try:
             if curr[0] < 0 or curr[1] < 0 or curr[0] > m['Height'] or curr[1] > m['Width']:
@@ -82,7 +82,7 @@ def change_mutation(individual):
 
 
 def mutation(individual):
-    mutation_choice = numpy.random.choice([0, 1, 2, 3], p=[0.15, 0, 0.20, 0.65])
+    mutation_choice = numpy.random.choice([0, 1, 2, 3], p=[0.25, 0, 0.25, 0.50])
 
     if mutation_choice == 0:
         return exchange_mutation(individual)
@@ -117,6 +117,8 @@ def print_way(individual):
     curr = m['Start']
     t_c = 0
     for step in machine.run_program(copy.deepcopy(individual)):
+        if t_c == m['Treasure_count']:
+            return
         curr = (curr[0] + steps[step][0], curr[1] + steps[step][1])
         print(curr)
         try:
@@ -130,23 +132,6 @@ def print_way(individual):
         except:
             return
     return
-
-
-# def genetic_algorithm(population, fiitness_fn, mutate_fn, reproduce_fn, requirement_fn):
-
-top = genetic_algorithm(generate_population(40, 40), fiitness_function, mutation, crossover, requirement)
-print(top['Fiitness'])
-print(top['Object'])
-print_way(top['Object'])
-
-
-# program = [240, 141, 56, 66, 29, 45, 186, 217, 98, 1, 29, 96, 7, 1, 254, 151, 231, 81, 71, 163, 85, 19,
-# 186, 75, 244, 242, 88, 1, 2, 82, 248, 22, 115, 238, 216, 231, 106, 192, 219, 18, 7, 243, 239, 249, 20, 112,
-# 92, 231, 29, 105, 108, 22, 56, 114, 88, 36, 132, 186, 45, 52, 249, 22, 125, 186]
-# machine = VirtualMachine(500)
-#
-# pat = [x for x in machine.run_program(program)]
-# print(fiitness_function(program))
 
 
 def test_fiitness_fn():
