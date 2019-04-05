@@ -8,14 +8,31 @@ class VirtualMachine:
 
     @staticmethod
     def get_instruction(current):
+        """
+        :param current: int
+                    current memory block
+        :return: int
+            current instruction
+        """
         return current >> 6
 
     @staticmethod
     def get_memory(mem_block):
+        """
+        :param mem_block: int
+                    current memory block
+        :return:
+        """
         return ((1 << 6) - 1) & mem_block
 
     @staticmethod
     def increment_mem(mem_block):
+        """
+        increments whole memory block
+        :param mem_block: int
+        :return: int
+                new memory block
+        """
         if mem_block + 1 == int('0b100000000', 2):
             return 0
         else:
@@ -23,6 +40,12 @@ class VirtualMachine:
 
     @staticmethod
     def decrement_mem(mem_block):
+        """
+        decrements whole memory block
+        :param mem_block: int
+        :return:int
+                new memory block
+        """
         if mem_block == 0:
             return int('0b11111111', 2)
         else:
@@ -30,26 +53,59 @@ class VirtualMachine:
 
     @classmethod
     def get_letter(cls, mem_block):
-        # print('getting letter ' + str(cls.LETTERS[mem_block & 3]))
+        """
+        :param mem_block: int
+        :return: str
+                returns letter that is represented by payload in memory block
+        """
         return cls.LETTERS[mem_block & 3]
 
     def increment(self, curr):
+        """
+        One of basic operations, increments memory block and returns it
+        :param curr: dict
+                    current memory block
+        :return: dict
+            new memory block
+        """
         incremented_value = VirtualMachine.increment_mem(curr['Memory_block'])
         curr['Memory_block'] = incremented_value
         return curr
 
     def decrement(self, curr):
+        """
+        basic operation, decrements memory block
+        :param curr: dict
+                    current memory block
+        :return: dict
+        new memory block
+        """
         decremented_value = VirtualMachine.decrement_mem(curr['Memory_block'])
         curr['Memory_block'] = decremented_value
         return curr
 
     def jump(self, curr, program):
+        """
+        Basic operation, jumps to another position
+        :param curr: dict
+        :param program: list
+                whole program
+        :return:
+            returns dict
+            new memory block
+        """
         new_address = VirtualMachine.get_memory(curr['Memory_block'])
         curr['Address'] = new_address
         curr['Memory_block'] = program[new_address ]
         return curr
 
     def write(self, curr):
+        """
+        Basic operation
+        :param curr: dict
+        :return: str
+            letter to be writen
+        """
         return VirtualMachine.get_letter(curr['Memory_block'])
 
     def __init__(self, limit):
@@ -57,6 +113,13 @@ class VirtualMachine:
         self.LIMIT = limit
 
     def run_program(self, program):
+        """
+        Main method of vm class, runs given program and as generator yields letters to be used in fitness fuction
+        :param program: list
+                list of commands
+        :return: str
+            yields letters
+        """
         try:
             curr = {
                 'Address': 0,
