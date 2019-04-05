@@ -1,6 +1,5 @@
 from random import randint, choice
 from virtual_machine import VirtualMachine
-from map_generator import read_map
 import numpy
 import copy
 

@@ -90,7 +90,7 @@ def anneal(p, time, c_avg, p_avg):
     return p
 
 
-def genetic_algorithm(population, fiitness_fn, vm, mutate_fn, reproduce_fn, requirement_fn, mutate_pro, m):
+def genetic_algorithm(population, fiitness_fn, vm, mutate_fn, reproduce_fn, requirement_fn, mutate_pro, m, el):
     """
     Main method of project, represent evolution algorithm
     :param population: list     => starting population of individuals
@@ -101,6 +101,7 @@ def genetic_algorithm(population, fiitness_fn, vm, mutate_fn, reproduce_fn, requ
     :param requirement_fn: fn   => Function checking ic fitness is good enough
     :param mutate_pro:  list    => Probability distribution
     :param m: list              => Map on which solution is to be found
+    :param el: int              => Number of individuals to be taken to the next generation
     :return: dict, int, list
         Best individual, number of generations it took to find him and list of average fitnesses
     """
@@ -115,11 +116,11 @@ def genetic_algorithm(population, fiitness_fn, vm, mutate_fn, reproduce_fn, requ
         print('Avg: ' + str(avg))
         averages.append(avg)
 
-        for j in range(0, 10):
+        for j in range(0, el):
             population[j]['Object'] = mutate_fn(population[j]['Object'], mutate_pro) # this can be turned off
             new_population.append(population[j])
 
-        for j in range(0, len(population) - 10):
+        for j in range(0, len(population) - el):
             child = {}
             father = roulette_selection(population)
             mother = roulette_selection(population)
