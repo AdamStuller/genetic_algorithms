@@ -3,6 +3,13 @@ from os import path
 
 
 def generate_map(x, y):
+    """
+    Method that generates new map
+    :param x:   int
+        size of new map in x dimension
+    :param y:   int
+        size of new map in y dimension
+    """
     start_x = int(randint(0, x - 1))
     start_y = int(randint(0, y - 1))
 
@@ -19,9 +26,17 @@ def generate_map(x, y):
         print()
 
 
-def read_map():
+def read_map(name='map1.txt'):
+    """
+    Method, that reads given map in txt format
+    :param name: str
+                name of map to be read in maps folder
+    :return: str[][]
+    Two dimensional array of characters, representing map
+
+    """
     m = []
-    p = path.join('.', 'maps', 'map1.txt')
+    p = path.join('.', 'maps', name)
     p_counter = 0
     with open(p) as fp:
         for line in fp:
@@ -33,8 +48,8 @@ def read_map():
                     p_counter += 1
             m.append(line_arr)
 
-    for i in range(0 , len(m)):
-        for j in range(0 , len(m[i])):
+    for i in range(0, len(m)):
+        for j in range(0, len(m[i])):
             if m[i][j] == 'S':
                 x, y = j, i
 
@@ -48,5 +63,10 @@ def read_map():
     return map_object
 
 
-# generate_map(50 , 50)
-# print(read_map())
+def main():
+    generate_map(6, 6)
+
+
+if __name__ == "__main__":
+    main()
+

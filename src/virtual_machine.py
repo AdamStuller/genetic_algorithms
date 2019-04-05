@@ -47,10 +47,9 @@ class VirtualMachine:
         new_address = VirtualMachine.get_memory(curr['Memory_block'])
         curr['Address'] = new_address
         curr['Memory_block'] = program[new_address ]
-        # print('Jumping')
         return curr
 
-    def write(self, curr, program):
+    def write(self, curr):
         return VirtualMachine.get_letter(curr['Memory_block'])
 
     def __init__(self, limit):
@@ -58,7 +57,6 @@ class VirtualMachine:
         self.LIMIT = limit
 
     def run_program(self, program):
-        # output = []
         try:
             curr = {
                 'Address': 0,
@@ -83,10 +81,8 @@ class VirtualMachine:
 
             if instruction != 2 and curr['Address'] != 63:
                 curr['Address'] += 1
-                try:
-                    curr['Memory_block'] = program[curr['Address']] # hot fix only :( not needed anymore
-                except IndexError:
-                    return
+                curr['Memory_block'] = program[curr['Address']]
+
             elif curr['Address'] == 63:
                 return
 
@@ -126,12 +122,4 @@ def test_get_letters():
     assert VirtualMachine.get_letter(int('0b00000000', 2)) == 'H'
     assert VirtualMachine.get_letter(int('0b00000010', 2)) == 'P'
 
-def test_virtual_machine():
-    program = [0 for x in range(0, 64)]
-    program[0] = int('0b11101001', 2)
-    program[1] = int('0b11000010', 2)
-    program[2] = int('0b10000001', 2)
-    machine = VirtualMachine(20)
-    output =  [x for x in machine.run_program(program)]
-    assert output == ['D' , 'P', 'P', 'P', 'P', 'P', 'P', 'P', 'P','P', 'P' ]
 

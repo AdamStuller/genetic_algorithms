@@ -10,8 +10,6 @@ def main():
     print_way(top['Object'])
     plt.plot([x for x in range(0, gen + 1)], avgs)
     plt.show()
-    # print(gen)
-    # print(len(avgs))
 
 
 
