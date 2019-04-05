@@ -44,7 +44,7 @@ def anneal(p, time, c_avg, p_avg):
     return p
 
 
-def genetic_algorithm(population, fiitness_fn, mutate_fn, reproduce_fn, requirement_fn, mutate_pro):
+def genetic_algorithm(population, fiitness_fn, vm, mutate_fn, reproduce_fn, requirement_fn, mutate_pro, m_name):
     averages = [27]
 
     for i in range(0, 10000):
@@ -68,8 +68,8 @@ def genetic_algorithm(population, fiitness_fn, mutate_fn, reproduce_fn, requirem
             child['Object'] = reproduce_fn(father['Object'], mother['Object'])
             child['Object'] = mutate_fn(child['Object'], mutate_pro)
 
-            child['Fiitness'] = fiitness_fn(child['Object'])
-            if requirement_fn(child['Fiitness']):
+            child['Fiitness'] = fiitness_fn(child['Object'], vm, m_name)
+            if requirement_fn(child['Fiitness'], m_name):
                 return child, i, [averages[x] for x in range(1, len(averages))]
 
             new_population.append(child)

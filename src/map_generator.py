@@ -64,7 +64,7 @@ def read_map(name='map1.txt'):
 
 
 def main():
-    generate_map(6, 6)
+    generate_map(10, 10)
 
 
 if __name__ == "__main__":

@@ -12,28 +12,57 @@ steps = {
 }
 
 
-def generate_population(n, k):
+def generate_population(n, k, vm, m_name):
+    """
+    This method creates new list of individuals
+    :param n: int
+                number of individuals in first generation
+    :param k: int
+                minimal number of commands in each individual
+    :param vm: VirtualMachine
+    :return: int[]
+        population of size n
+    """
     population = []
     for i in range(0, n):
         individual = generate_individual(randint(k, 63))
         population.append(individual)
-    pop = list(map(lambda x: {'Object': x, 'Fiitness': fiitness_function(x)}, population))
+    pop = list(map(lambda x: {'Object': x, 'Fiitness': fiitness_function(x, vm, m_name)}, population))
     print(pop)
     return pop
 
 
 def generate_individual(initial_size):
+    """
+    Creates individual
+    :param initial_size: int
+                    Number of non-zero commands in individual
+    :return: int []
+        Individual, list of integers, each representing single command for virtual machine
+    """
     individual = [0 for x in range(0, 64)]
     for i in range(0, initial_size):
         individual[i] = randint(0, (1 << 8) - 1)
     return individual
 
 
-def fiitness_function(individual):
-    m = read_map()
-    machine = VirtualMachine(500)
+def fiitness_function(individual, machine, m_name):
+    """
+    Method to evaluate individual's fitness, runs virtual machine in itself and compares the
+    result of program with map. Fitness starts at 1 and adds 1 for each found treasure and subtracts
+    0.0001 for each field. That way, fitness function is made up by both, number of treachures and
+    length of solution
+    :param individual: int []
+                    Program to be run on virtual machine
+    :param machine: VirtualMachine
+    :param m: str[][]
+    :return: int
+            Fitness of individual- number between up to 1 + number of treasures
+    """
+    m = read_map(m_name)
     curr = m['Start']
     fiitness = 1
+
     for step in machine.run_program(copy.deepcopy(individual)):
         if fiitness > m['Treasure_count']:
             return fiitness
@@ -49,6 +78,13 @@ def fiitness_function(individual):
 
 
 def exchange_mutation(individual):
+    """
+    Mutation, that exchanges two random commands from individual
+    :param individual: int []
+                Program for virtual machine
+    :return: int[]
+            Mutated individual
+    """
     c1, c2 = randint(0, 63), randint(0, 63)
     while individual[c1] == 0:
         c1 = randint(0, 63)
@@ -60,23 +96,30 @@ def exchange_mutation(individual):
     return individual
 
 
-def add_mutation(individual):
-    for i in range(0, len(individual)):
-        if individual[i] == 0:
-            individual[i] = randint(0, (1 << 8) - 1)
-            return individual
-
-
 def change_mutation(individual):
+    """
+    Mutation that changes one random command from individual
+    :param individual: int[]
+                Program for virtual machine
+    :return: int[]
+        mutated individual
+    """
     c = randint(0, 63)
-    try:
-        individual[c] = randint(0, (1 << 8) - 1)
-    except IndexError:
-        pass
+    individual[c] = randint(0, (1 << 8) - 1)
     return individual
 
 
 def mutation(individual, pro):
+    """
+    Method that examines probability of each kind of mutation and randomly chooses either one of then
+    or no mutation at all
+    :param individual: int[]
+                program to virtual machine
+    :param pro:     int[]
+                probability distribution
+    :return: int []
+        Either mutated or old individual
+    """
     mutation_choice = numpy.random.choice([0, 1, 2], p=pro)
 
     if mutation_choice == 0:
@@ -88,6 +131,16 @@ def mutation(individual, pro):
 
 
 def crossover(father, mother):
+    """
+    Crossover method that randomly divides parents and creates their child by concatenating
+    their respective parts
+    :param father: int[]
+                program individual
+    :param mother: int[]
+                program individual
+    :return:int[]
+            child individual
+    """
     div = randint(0, 20)
     child = []
     for i in range(0, div):
@@ -98,21 +151,39 @@ def crossover(father, mother):
 
 
 def crossover2(father, mother):
+    """
+    Another crossover method, that creates new individual taking odd commands from one parent and
+    even from another
+    :param father: int[]
+    :param mother: int[]
+    :return: int[]
+    """
     child = []
     for i in range(0, len(father)):
         child.append(choice([father, mother])[i])
     return child
 
 
-def requirement(fiitness):
-    m = read_map()
-    if fiitness >= m['Treasure_count'] :
-        return True
-    return False
+def requirement(fiitness, m_name):
+    """
+    Determines if current fiitness is enogh
+    :param fiitness: int
+                Current fitness
+    :param m_name: str
+                Name of the map to be used
+    :return: bool
+        true if it is enough else false
+    """
+    m = read_map(m_name)
+    return True if fiitness >= m['Treasure_count'] else False
 
 
-def print_way(individual):
-    m = read_map()
+def print_way(individual, m_name):
+    """
+    Prints found way
+    :param individual: int
+    """
+    m = read_map(m_name)
     machine = VirtualMachine(500)
     curr = m['Start']
     t_c = 0
