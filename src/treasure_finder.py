@@ -12,7 +12,7 @@ steps = {
 }
 
 
-def generate_population(n, k, vm, m_name):
+def generate_population(n, k, vm, m):
     """
     This method creates new list of individuals
     :param n: int
@@ -27,7 +27,7 @@ def generate_population(n, k, vm, m_name):
     for i in range(0, n):
         individual = generate_individual(randint(k, 63))
         population.append(individual)
-    pop = list(map(lambda x: {'Object': x, 'Fiitness': fiitness_function(x, vm, m_name)}, population))
+    pop = list(map(lambda x: {'Object': x, 'Fiitness': fiitness_function(x, vm, m)}, population))
     print(pop)
     return pop
 
@@ -46,7 +46,7 @@ def generate_individual(initial_size):
     return individual
 
 
-def fiitness_function(individual, machine, m_name):
+def fiitness_function(individual, machine, m):
     """
     Method to evaluate individual's fitness, runs virtual machine in itself and compares the
     result of program with map. Fitness starts at 1 and adds 1 for each found treasure and subtracts
@@ -59,7 +59,6 @@ def fiitness_function(individual, machine, m_name):
     :return: int
             Fitness of individual- number between up to 1 + number of treasures
     """
-    m = read_map(m_name)
     curr = m['Start']
     fiitness = 1
 
@@ -164,7 +163,7 @@ def crossover2(father, mother):
     return child
 
 
-def requirement(fiitness, m_name):
+def requirement(fiitness, m):
     """
     Determines if current fiitness is enogh
     :param fiitness: int
@@ -174,16 +173,14 @@ def requirement(fiitness, m_name):
     :return: bool
         true if it is enough else false
     """
-    m = read_map(m_name)
-    return True if fiitness >= m['Treasure_count'] else False
+    return True if fiitness >= m['Treasure_count'] + 0.01 else False
 
 
-def print_way(individual, m_name):
+def print_way(individual, m):
     """
     Prints found way
     :param individual: int
     """
-    m = read_map(m_name)
     machine = VirtualMachine(500)
     curr = m['Start']
     t_c = 0
