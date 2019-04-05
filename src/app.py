@@ -1,13 +1,21 @@
 from evolution import genetic_algorithm
-from treasure_finder import fiitness_function, mutation, crossover, requirement, print_way, generate_population
+from treasure_finder import *
+import matplotlib.pyplot as plt
 
 
 def main():
-    top = genetic_algorithm(generate_population(150, 64), fiitness_function, mutation, crossover, requirement)
+    top, gen, avgs = genetic_algorithm(generate_population(150, 32), fiitness_function, mutation, crossover2, requirement, [0.4, 0.3, 0.3])
     print(top['Fiitness'])
     print(top['Object'])
     print_way(top['Object'])
+    plt.plot([x for x in range(0, gen + 1)], avgs)
+    plt.show()
+    # print(gen)
+    # print(len(avgs))
+
+
 
 
 if __name__ == "__main__":
     main()
+

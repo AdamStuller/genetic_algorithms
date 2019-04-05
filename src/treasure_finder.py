@@ -1,7 +1,6 @@
 from random import randint, choice
 from virtual_machine import VirtualMachine
 from map_generator import read_map
-from evolution import genetic_algorithm
 import numpy
 import copy
 
@@ -16,7 +15,7 @@ steps = {
 def generate_population(n, k):
     population = []
     for i in range(0, n):
-        individual = generate_individual(k)
+        individual = generate_individual(randint(k, 63))
         population.append(individual)
     pop = list(map(lambda x: {'Object': x, 'Fiitness': fiitness_function(x)}, population))
     print(pop)
@@ -38,18 +37,14 @@ def fiitness_function(individual):
     for step in machine.run_program(copy.deepcopy(individual)):
         if fiitness > m['Treasure_count']:
             return fiitness
-        fiitness -= 0.001
+        fiitness -= 0.0001
         curr = (curr[0] + steps[step][0], curr[1] + steps[step][1])
-        try:
-            if curr[0] < 0 or curr[1] < 0 or curr[0] > m['Height'] or curr[1] > m['Width']:
-                # print('out  of index')
-                return 0 if fiitness <= 0 else fiitness
-            if m['Map'][curr[0]][curr[1]] == 'P':
-                fiitness += 1
-                m['Map'][curr[0]][curr[1]] = 'X'
-        except:
-            print(curr)
+        if curr[0] < 0 or curr[1] < 0 or curr[0] > m['Height'] or curr[1] > m['Width']:
             return 0 if fiitness <= 0 else fiitness
+        if m['Map'][curr[0]][curr[1]] == 'P':
+            fiitness += 1
+            m['Map'][curr[0]][curr[1]] = 'X'
+
     return 0 if fiitness <= 0 else fiitness
 
 
@@ -81,14 +76,12 @@ def change_mutation(individual):
     return individual
 
 
-def mutation(individual):
-    mutation_choice = numpy.random.choice([0, 1, 2, 3], p=[0.25, 0, 0.25, 0.50])
+def mutation(individual, pro):
+    mutation_choice = numpy.random.choice([0, 1, 2], p=pro)
 
     if mutation_choice == 0:
         return exchange_mutation(individual)
     elif mutation_choice == 1:
-        return add_mutation(individual)
-    elif mutation_choice == 2:
         return change_mutation(individual)
     else:
         return individual
@@ -104,9 +97,16 @@ def crossover(father, mother):
     return child
 
 
+def crossover2(father, mother):
+    child = []
+    for i in range(0, len(father)):
+        child.append(choice([father, mother])[i])
+    return child
+
+
 def requirement(fiitness):
     m = read_map()
-    if fiitness >= m['Treasure_count']:
+    if fiitness >= m['Treasure_count'] :
         return True
     return False
 
@@ -123,7 +123,6 @@ def print_way(individual):
         print(curr)
         try:
             if curr[0] < 0 or curr[1] < 0 or curr[0] > m['Height'] or curr[1] > m['Width']:
-                # print('out  of index')
                 return
             if m['Map'][curr[0]][curr[1]] == 'P':
                 t_c += 1

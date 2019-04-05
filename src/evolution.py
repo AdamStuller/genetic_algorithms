@@ -1,15 +1,23 @@
 import numpy
 
 
-def roulette_pro_dist(fiitness_arr):
+def roulette(fiitness_arr):
     s = sum(fiitness_arr)
     return list(map(lambda x: x / s, fiitness_arr))
 
 
-def selection(population):
+def roulette_selection(population):
     fiitness_arr = list(map(lambda x: x['Fiitness'], population))
-    probability_distribution = roulette_pro_dist(fiitness_arr)
+    probability_distribution = roulette(fiitness_arr)
     return numpy.random.choice(population, p=probability_distribution)
+
+
+def tournament_selection(population , prob):
+    for i in range(0 , len(population)):
+        main_p = prob*((1- prob)**i)
+        if numpy.random.choice([population[i], False], p=[main_p, 1-main_p]):
+            return population[i]
+    return population[0]
 
 
 def max_fiitness(population):
@@ -21,42 +29,66 @@ def average_fiitness(population):
     fiit = list(map(lambda x: x['Fiitness'], population))
     return sum(fiit)/len(fiit)
 
+def anneal(p, time, c_avg , p_avg):
+    p[-1] = 1
+    for i in range(0, len(p)-1):
+        sup_p = p[i] - (time / 10000)
+        p[i] = 0.1 if sup_p <= 0.05 else sup_p
+        p[-1] -= p[i]
 
-def genetic_algorithm(population, fiitness_fn, mutate_fn, reproduce_fn, requirement_fn):
+    if abs(c_avg - p_avg) < 0.02:
+        return [0.5, 0.5, 0]
+    return p
+
+
+
+def genetic_algorithm(population, fiitness_fn, mutate_fn, reproduce_fn, requirement_fn, mutate_pro):
+    averages = [27]
     for i in range(0, 10000):
         new_population = []
 
-        population = list(reversed(sorted(population, key=lambda x: x['Fiitness'])))
-        print('Max: ' + str(max_fiitness(population)))
-        print('Avg: ' + str(average_fiitness(population)))
-        # print(population)
 
-        for j in range(0, 8):
+        population = list(reversed(sorted(population, key=lambda x: x['Fiitness'])))
+        print('Population #: ' + str(i) + '\nMax: ' + str(max_fiitness(population)))
+        avg = average_fiitness(population)
+        print('Avg: ' + str(avg))
+        averages.append(avg)
+
+
+        for j in range(0, 10):
+            population[j]['Object'] = mutate_fn(population[j]['Object'], mutate_pro) # this can be turned off
             new_population.append(population[j])
 
-        for j in range(0, len(population) - 8):
+        for j in range(0, len(population) - 10):
             child = {}
-            father = selection(population)
-            mother = selection(population)
+            father = roulette_selection(population)
+            mother = roulette_selection(population)
+
             child['Object'] = reproduce_fn(father['Object'], mother['Object'])
 
-            child['Object'] = mutate_fn(child['Object'])
+
+            child['Object'] = mutate_fn(child['Object'], mutate_pro)
 
             child['Fiitness'] = fiitness_fn(child['Object'])
             if requirement_fn(child['Fiitness']):
-                return child
+                return child, i, [averages[x] for x in range(1, len(averages))]
 
             new_population.append(child)
-
-        # print(population)
+        mutate_pro = anneal(mutate_pro, i , averages[-1], averages[-2])
         population = new_population
+
+    print('halloc' + str(i))
 
     return {
         'Object': None,
         'Fiitness': None
-    }
+    }, i, averages
 
 
 def test_selection():
     test_population = [{'Object': 1, 'Fiitness': 20}, {'Object': 2, 'Fiitness': 30}, {'Object': 3, 'Fiitness': 100}]
-    assert selection(test_population)['Object'] in set(list(map(lambda x: x['Object'], test_population)))
+    assert roulette_selection(test_population)['Object'] in set(list(map(lambda x: x['Object'], test_population)))
+
+
+# if __name__ == '__main__':
+#     print(tournament_selection([32 , 43 , 12] , 0.3))
