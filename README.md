@@ -17,16 +17,16 @@ related to virtual machine my program si using. From app.py whole program si run
 
 ```
 git clone git@github.com:AdamStuller/genetic_algorithms.git
-cd ./chessboard
+cd ./src
 ```
 
-Now you have repository cloned. You can create virtual enviroment by running:
+Now you have repository cloned. You can create virtual environment by running:
 ```
 python3.7 -m venv ./venv
 ./venv/bin/pip3.7 install -r ./requirements.txt
 ```
 
-And then, after modifying config run:
+And then, after modifying, config run:
 ```
-./venv/bin/python3.7 ./src/chessboard.py
+./venv/bin/python3.7 ./src/app.py
 ```
