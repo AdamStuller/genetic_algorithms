@@ -1,4 +1,4 @@
-#Genetic Algorithm
+# Genetic Algorithm
 
 This repo contains program using genetic algorithm to find treasures on map. 
 
